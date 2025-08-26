@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WPM Tester - Yellow Edition with Public Leaderboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --yellow-bg: #fff700;
+            --yellow-dark: #ffd600;
+            --yellow-accent: #ffee58;
+            --text-color: #212121;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        body {
+            background: linear-gradient(120deg, var(--yellow-bg), var(--yellow-dark));
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: var(--yellow-accent);
+            border-radius: 16px;
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem 2rem;
+            max-width: 550px;
+            width: 96%;
+            margin: 2rem auto;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 0.2em;
+            font-size: 2.3rem;
+            letter-spacing: 2px;
+            color: #b89c00;
+        }
+        #nicknamePrompt {
+            display: none;
+            background: #fffde7;
+            border-radius: 9px;
+            padding: 1.5em 1em;
+            margin-bottom: 1.8em;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.13);
+        }
+        #nicknameInput {
+            font-size: 1.1em;
+            padding: 0.5em 1em;
+            border-radius: 6px;
+            border: 2px solid #ffd600;
+            outline: none;
+        }
+        #saveNickname {
+            margin-left: 0.5em;
+            padding: 0.5em 1.5em;
+            border-radius: 6px;
+            border: none;
+            background: #ffd600;
+            color: #212121;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #quote {
+            font-size: 1.18rem;
+            margin: 1.5rem 0;
+            padding: 1.1em;
+            background: #fffde7;
+            border-radius: 9px;
+            min-height: 60px;
+            word-break: break-word;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(200, 180, 0, 0.08);
+        }
+        #input {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 0.7em;
+            border: 2px solid #ffd600;
+            border-radius: 7px;
+            outline: none;
+            background: #fffde7;
+            margin-bottom: 1.1rem;
+            transition: border-color 0.2s;
+        }
+        #input:focus {
+            border-color: #b89c00;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1.3em;
+        }
+        .stat {
+            background: #fffde7;
+            border-radius: 7px;
+            padding: 0.7em 1.2em;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.08);
+            font-weight: bold;
+            color: #b89c00;
+        }
+        #restart {
+            background: #fff700;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7em 2em;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #212121;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.09);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        #restart:hover {
+            background: #b89c00;
+            color: #fffde7;
+        }
+        .public-leaderboard {
+            margin-top: 2em;
+            background: #fffde7;
+            border-radius: 11px;
+            padding: 1.2em 1em 1em 1em;
+            box-shadow: 0 2px 12px rgba(255, 215, 0, 0.11);
+            color: #b89c00;
+            font-size: 1.05rem;
+        }
+        .leaderboard-title {
+            font-weight: bold;
+            font-size: 1.05em;
+            letter-spacing: 1px;
+            margin-bottom: 0.5em;
+        }
+        .leaderboard-list {
+            list-style: none;
+            margin: 0.2em 0 0 0;
+            padding: 0;
+        }
+        .leaderboard-list li {
+            background: #fffde7;
+            border-radius: 5px;
+            margin: 0.12em 0;
+            padding: 0.37em 0.5em;
+            font-size: 1em;
+            color: #b89c00;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+        }
+        .leaderboard-list li .score {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        .leaderboard-list li .date {
+            color: #7e6900;
+            font-size: 0.92em;
+            margin-left: 1.3em;
+        }
+        .bomb-game {
+            margin-top: 2em;
+            background: #fffde7;
+            border-radius: 11px;
+            padding: 1em 1em 1.3em 1em;
+            box-shadow: 0 2px 18px rgba(255, 215, 0, 0.15);
+            color: #b89c00;
+            text-align: center;
+            font-size: 1.08rem;
+            position: relative;
+        }
+        .bomb-title {
+            font-weight: bold;
+            font-size: 1.08em;
+            letter-spacing: 1.2px;
+            margin-bottom: 0.6em;
+        }
+        .bomb-emoji {
+            font-size: 2.2em;
+            margin: 0.2em 0;
+            display: block;
+        }
+        .bomb-timer {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #c62828;
+            margin: 0.3em 0 0.7em 0;
+        }
+        .bomb-status {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #c62828;
+            margin-top: 0.6em;
+            min-height: 1.2em;
+        }
+        #bombInput {
+            width: 100%;
+            font-size: 1.08rem;
+            padding: 0.6em;
+            border: 2px solid #ffd600;
+            border-radius: 7px;
+            outline: none;
+            background: #fffde7;
+            margin-bottom: 0.6em;
+            margin-top: 0.6em;
+            transition: border-color 0.2s;
+            text-align: left;
+        }
+        #bombInput:focus {
+            border-color: #b89c00;
+        }
+        #startBomb {
+            background: #fff700;
+            border: none;
+            border-radius: 6px;
+            padding: 0.6em 2.2em;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #212121;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            cursor: pointer;
+            margin-top: 0.7em;
+            transition: background 0.2s, color 0.2s;
+        }
+        #startBomb:hover {
+            background: #b89c00;
+            color: #fffde7;
+        }
+        .bomb-leaderboard {
+            margin: 1.5em auto 0 auto;
+            background: #fffde7;
+            border-radius: 9px;
+            padding: 1.1em 0.7em 0.9em 0.7em;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.08);
+            color: #b89c00;
+            text-align: center;
+            width: 99%;
+            max-width: 350px;
+        }
+        .bomb-leaderboard-title {
+            font-weight: bold;
+            font-size: 1.05em;
+            letter-spacing: 1px;
+            margin-bottom: 0.5em;
+        }
+        .bomb-leaderboard-list {
+            list-style: none;
+            margin: 0.2em 0 0 0;
+            padding: 0;
+        }
+        .bomb-leaderboard-list li {
+            background: #fffde7;
+            border-radius: 5px;
+            margin: 0.12em 0;
+            padding: 0.37em 0.5em;
+            font-size: 1em;
+            color: #b89c00;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+        }
+        .bomb-leaderboard-list li .score {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        .bomb-leaderboard-list li .date {
+            color: #7e6900;
+            font-size: 0.92em;
+            margin-left: 1.3em;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.2rem 0.4rem;
+            }
+            #quote {
+                font-size: 1rem;
+            }
+            .public-leaderboard, .bomb-game, .bomb-leaderboard {
+                padding: 0.7em 0.2em 0.7em 0.2em;
+            }
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ WPM Yellow Tester ⚡</h1>
+        <div id="nicknamePrompt">
+            <b>Enter your nickname to appear on the leaderboard:</b><br>
+            <input type="text" id="nicknameInput" maxlength="18" />
+            <button id="saveNickname">Save</button>
+        </div>
+        <div id="quote">Loading...</div>
+        <input type="text" id="input" autocomplete="off" placeholder="Start typing here..." disabled />
+        <div class="stats">
+            <div class="stat">WPM: <span id="wpm">0</span></div>
+            <div class="stat">Time: <span id="time">0.0</span>s</div>
+        </div>
+        <button id="restart">Restart</button>
+        <div class="public-leaderboard" id="wpmLeaderboard">
+            <div class="leaderboard-title">🌍 Public WPM Leaderboard</div>
+            <ul class="leaderboard-list" id="wpmLeaderboardList"></ul>
+            <div style="font-size:0.93em;color:#7e6900;margin-top:0.4em;">(Top 10 fastest, updated live!)</div>
+        </div>
+        <div class="bomb-game" id="bombGame">
+            <div class="bomb-title">💣 Bomb Mini Game (15s typing challenge!)</div>
+            <span class="bomb-emoji" id="bombEmoji">💣</span>
+            <div class="bomb-timer" id="bombTimer">15.0</div>
+            <div style="font-size:0.98em;margin-bottom:0.8em;color:#7e6900;">Type the phrase before the bomb blows up!</div>
+            <div id="bombQuote" style="background:#fffde7;border-radius:6px;padding:0.5em 0.7em;margin-bottom:0.4em;min-height:40px;"></div>
+            <input type="text" id="bombInput" autocomplete="off" placeholder="Type here to defuse the bomb!" disabled />
+            <br>
+            <button id="startBomb">Start Bomb Game</button>
+            <div class="bomb-status" id="bombStatus"></div>
+            <audio id="bombSound">
+                <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9c8b43.mp3" type="audio/mp3">
+            </audio>
+            <div class="bomb-leaderboard" id="bombLeaderboard">
+                <div class="bomb-leaderboard-title">🏅 Bomb Game Leaderboard</div>
+                <ul class="bomb-leaderboard-list" id="bombLeaderboardList"></ul>
+                <div style="font-size:0.93em;color:#7e6900;margin-top:0.4em;">(Top 10 fastest defuses, lower is better!)</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // --- Firebase config (replace with your own from Firebase Console) ---
+        var firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+
+        // --- Nickname logic ---
+        let nickname = localStorage.getItem('wpm-nickname') || "";
+        const nicknamePrompt = document.getElementById('nicknamePrompt');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const saveNicknameBtn = document.getElementById('saveNickname');
+
+        function requireNickname() {
+            if (!nickname) {
+                nicknamePrompt.style.display = 'block';
+                nicknameInput.focus();
+            }
+        }
+        function saveNickname() {
+            let val = nicknameInput.value.trim();
+            if (val.length < 2) {
+                alert("Nickname must be at least 2 characters.");
+                return;
+            }
+            nickname = val;
+            localStorage.setItem('wpm-nickname', nickname);
+            nicknamePrompt.style.display = 'none';
+        }
+        saveNicknameBtn.onclick = saveNickname;
+        nicknameInput.onkeydown = e => { if (e.key === "Enter") saveNickname(); };
+        if (!nickname) requireNickname();
+
+        // --- Quotes ---
+        const quotes = [
+            "The quick brown fox jumps over the lazy dog.",
+            "Typing fast is a useful skill for everyone.",
+            "Yellow is the color of sunshine and energy.",
+            "Practice makes perfect when it comes to typing.",
+            "Code, type, repeat. Improve your WPM daily!",
+            "Speed and accuracy go hand in hand.",
+            "Let your fingers dance across the keys.",
+            "Stay focused and keep your eyes on the screen.",
+            "A bright mind deserves a bright interface.",
+            "Consistency is the key to mastering typing."
+        ];
+
+        // --- Main WPM game logic ---
+        const quoteEl = document.getElementById('quote');
+        const inputEl = document.getElementById('input');
+        const wpmEl = document.getElementById('wpm');
+        const timeEl = document.getElementById('time');
+        const restartBtn = document.getElementById('restart');
+        const wpmLeaderboardList = document.getElementById('wpmLeaderboardList');
+
+        let currentQuote = '';
+        let startTime = null;
+        let interval = null;
+        let finished = false;
+
+        function pickQuote() {
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        function reset() {
+            inputEl.value = '';
+            inputEl.disabled = true;
+            wpmEl.textContent = '0';
+            timeEl.textContent = '0.0';
+            finished = false;
+            currentQuote = pickQuote();
+            quoteEl.textContent = currentQuote;
+            clearInterval(interval);
+            setTimeout(() => {
+                if (!nickname) requireNickname();
+                inputEl.disabled = false;
+                inputEl.placeholder = "Start typing here...";
+                inputEl.focus();
+                startTime = null;
+            }, 300);
+        }
+
+        inputEl.addEventListener('input', () => {
+            if (!startTime) {
+                startTime = Date.now();
+                interval = setInterval(updateStats, 80);
+            }
+            const typed = inputEl.value;
+            if (typed === currentQuote) {
+                finished = true;
+                clearInterval(interval);
+                updateStats(true);
+                inputEl.disabled = true;
+                maybeSubmitWpmScore();
+            }
+        });
+
+        function updateStats(forceEnd = false) {
+            if (!startTime) return;
+            let elapsed = (Date.now() - startTime) / 1000;
+            if (forceEnd) elapsed = (Date.now() - startTime) / 1000;
+            timeEl.textContent = elapsed.toFixed(1);
+
+            const words = currentQuote.trim().split(/\s+/).length;
+            let wpm = (inputEl.value.length === 0) ? 0 : (words / (elapsed / 60));
+            wpmEl.textContent = Math.round(wpm);
+
+            if (finished) {
+                timeEl.textContent = elapsed.toFixed(1);
+                wpmEl.textContent = Math.round(wpm);
+            }
+        }
+
+        function maybeSubmitWpmScore() {
+            if (!nickname) return;
+            let wpm = parseInt(wpmEl.textContent, 10);
+            let time = parseFloat(timeEl.textContent);
+            if (!wpm || wpm < 5) return; // Ignore trash runs
+            // Only submit if score is in top 10 or leaderboard has < 10
+            db.ref('public-wpm-leaderboard').once('value', snap => {
+                let arr = [];
+                snap.forEach(child => arr.push({...child.val(), key: child.key}));
+                arr.sort((a, b) => b.wpm - a.wpm || a.time - b.time);
+                if (arr.length < 10 || wpm > arr[arr.length-1].wpm ||
+                    (wpm === arr[arr.length-1].wpm && time < arr[arr.length-1].time)) {
+                    db.ref('public-wpm-leaderboard').push({
+                        name: nickname,
+                        wpm: wpm,
+                        time: time,
+                        date: new Date().toISOString().replace("T"," ").slice(0,16)
+                    });
+                }
+            });
+        }
+
+        function showWpmLeaderboard() {
+            db.ref('public-wpm-leaderboard').orderByChild('wpm').limitToLast(10).on('value', snap => {
+                let arr = [];
+                snap.forEach(child => arr.push(child.val()));
+                arr.sort((a, b) => b.wpm - a.wpm || a.time - b.time);
+                wpmLeaderboardList.innerHTML = "";
+                if (!arr.length) {
+                    wpmLeaderboardList.innerHTML = "<li>No scores yet!</li>";
+                }
+                arr.forEach((entry, idx) => {
+                    let li = document.createElement('li');
+                    li.innerHTML = `<span>#${idx+1}</span> <span class="score">${entry.name} ${entry.wpm} wpm</span> <span class="date">${entry.time.toFixed(2)}s</span>`;
+                    wpmLeaderboardList.appendChild(li);
+                });
+            });
+        }
+
+        // --- Bomb Mini Game logic ---
+        const bombEmoji = document.getElementById('bombEmoji');
+        const bombTimerEl = document.getElementById('bombTimer');
+        const bombQuoteEl = document.getElementById('bombQuote');
+        const bombInputEl = document.getElementById('bombInput');
+        const startBombBtn = document.getElementById('startBomb');
+        const bombStatusEl = document.getElementById('bombStatus');
+        const bombLeaderboardList = document.getElementById('bombLeaderboardList');
+        const bombSound = document.getElementById('bombSound');
+
+        let bombGameActive = false;
+        let bombTimer = 15.0;
+        let bombInterval = null;
+        let bombStartTime = null;
+        let bombQuote = '';
+        let bombFinished = false;
+
+        function resetBombGameUI() {
+            bombEmoji.textContent = "💣";
+            bombTimerEl.textContent = "15.0";
+            bombStatusEl.textContent = "";
+            bombInputEl.value = "";
+            bombInputEl.disabled = true;
+            bombQuoteEl.style.background = "#fffde7";
+            bombQuoteEl.style.color = "#212121";
+            startBombBtn.disabled = false;
+            bombFinished = false;
+        }
+
+        function startBombGame() {
+            resetBombGameUI();
+            bombQuote = pickQuote();
+            bombQuoteEl.textContent = bombQuote;
+            bombInputEl.disabled = false;
+            bombInputEl.placeholder = "Type here to defuse the bomb!";
+            bombInputEl.focus();
+            startBombBtn.disabled = true;
+            bombGameActive = true;
+            bombTimer = 15.0;
+            bombStartTime = Date.now();
+            bombTimerEl.textContent = bombTimer.toFixed(1);
+            bombStatusEl.textContent = "";
+            bombQuoteEl.style.background = "#fffde7";
+            bombQuoteEl.style.color = "#212121";
+            bombEmoji.textContent = "💣";
+            bombInterval = setInterval(bombTick, 50);
+        }
+
+        function bombTick() {
+            if (!bombGameActive) return;
+            let elapsed = (Date.now() - bombStartTime) / 1000;
+            let remaining = Math.max(0, 15.0 - elapsed);
+            bombTimerEl.textContent = remaining.toFixed(1);
+            if (remaining <= 0) {
+                bombExplode();
+            }
+        }
+
+        function bombExplode() {
+            if (bombFinished) return;
+            bombFinished = true;
+            bombGameActive = false;
+            clearInterval(bombInterval);
+            bombInputEl.disabled = true;
+            bombStatusEl.textContent = "💥 BOOM! The bomb exploded!";
+            bombQuoteEl.style.background = "#ffe0e0";
+            bombQuoteEl.style.color = "#c62828";
+            bombEmoji.textContent = "💥";
+            try { bombSound.currentTime = 0; bombSound.play(); } catch {}
+            startBombBtn.disabled = false;
+        }
+
+        function bombDefused() {
+            if (bombFinished) return;
+            bombFinished = true;
+            bombGameActive = false;
+            clearInterval(bombInterval);
+            bombInputEl.disabled = true;
+            let timeTaken = (Date.now() - bombStartTime) / 1000;
+            bombStatusEl.textContent = `🎉 Bomb defused in ${timeTaken.toFixed(2)}s!`;
+            bombQuoteEl.style.background = "#eaffd8";
+            bombQuoteEl.style.color = "#388e3c";
+            bombEmoji.textContent = "🟩";
+            maybeSubmitBombScore(timeTaken, bombQuote);
+            startBombBtn.disabled = false;
+        }
+
+        bombInputEl.addEventListener('input', () => {
+            if (!bombGameActive) return;
+            if (bombInputEl.value === bombQuote) {
+                bombDefused();
+            }
+        });
+
+        startBombBtn.addEventListener('click', () => {
+            if (!nickname) requireNickname();
+            else startBombGame();
+        });
+
+        function maybeSubmitBombScore(time, quote) {
+            if (!nickname) return;
+            if (time < 0.5) return; // Ignore trash runs
+            db.ref('public-bomb-leaderboard').once('value', snap => {
+                let arr = [];
+                snap.forEach(child => arr.push({...child.val(), key: child.key}));
+                arr.sort((a, b) => a.time - b.time);
+                if (arr.length < 10 || time < arr[arr.length-1].time) {
+                    db.ref('public-bomb-leaderboard').push({
+                        name: nickname,
+                        time: time,
+                        quote: quote,
+                        date: new Date().toISOString().replace("T"," ").slice(0,16)
+                    });
+                }
+            });
+        }
+
+        function showBombLeaderboard() {
+            db.ref('public-bomb-leaderboard').orderByChild('time').limitToFirst(10).on('value', snap => {
+                let arr = [];
+                snap.forEach(child => arr.push(child.val()));
+                arr.sort((a, b) => a.time - b.time);
+                bombLeaderboardList.innerHTML = "";
+                if (!arr.length) {
+                    bombLeaderboardList.innerHTML = "<li>No defuses yet!</li>";
+                }
+                arr.forEach((entry, idx) => {
+                    let li = document.createElement('li');
+                    li.innerHTML = `<span>#${idx+1}</span> <span class="score">${entry.name} ${entry.time.toFixed(2)}s</span> <span class="date">${entry.date}</span>`;
+                    li.title = "Phrase: " + entry.quote;
+                    bombLeaderboardList.appendChild(li);
+                });
+            });
+        }
+
+        // --- Init ---
+        resetBombGameUI();
+        showBombLeaderboard();
+        showWpmLeaderboard();
+        reset();
+    </script>
+</body>
+</html>
